@@ -56,8 +56,8 @@ local TR6 = {
   ["Cancel"] = X("취소", "Batal", "Annuler", "取消"),
   ["File paths are hidden for privacy. Turn on Debug Mode at the top."] = X("개인정보 보호를 위해 파일 경로를 숨겼습니다. 상단에서 디버그 모드를 켜세요.", "Path file disembunyikan demi privasi. Aktifkan Mode Debug di bagian atas.", "Les chemins sont masqués pour la confidentialité. Activez le mode débogage en haut.", "為保護隱私已隱藏檔案路徑。請在上方開啟偵錯模式。"),
   ["(hidden for privacy)"] = X("(개인정보 보호를 위해 숨김)", "(disembunyikan demi privasi)", "(masqué pour la confidentialité)", "(為保護隱私已隱藏)"),
-  ["Debug Mode: ON"] = X("디버그 모드: ON", "Mode Debug: ON", "Mode débogage : ON", "偵錯模式：ON"),
-  ["Debug Mode: OFF"] = X("디버그 모드: OFF", "Mode Debug: OFF", "Mode débogage : OFF", "偵錯模式：OFF"),
+  ["Debug Mode ✅"] = X("디버그 모드 ✅", "Mode Debug ✅", "Mode débogage ✅", "偵錯模式 ✅"),
+  ["Debug Mode ⬜"] = X("디버그 모드 ⬜", "Mode Debug ⬜", "Mode débogage ⬜", "偵錯模式 ⬜"),
   ["Debug Mode"] = X("디버그 모드", "Mode Debug", "Mode débogage", "偵錯模式"),
   ["Uninstall"] = X("제거", "Hapus instalasi", "Désinstallation", "解除安裝"),
   ["1. Export your settings below if you want to keep them."] = X("1. 설정을 유지하려면 아래 항목에서 내보내세요.", "1. Ekspor pengaturan di bawah jika ingin menyimpannya.", "1. Exportez vos réglages ci-dessous si vous voulez les garder.", "1. 若要保留設定，請先在下方匯出。"),
@@ -1183,8 +1183,8 @@ local function apply_visibility(containers, settings)
   local b = find_prop(containers, "btn_paths")
   if b then
     obs.obs_property_set_description(b, debug_mode
-      and tr("Debug Mode: ON", "デバッグモード: ON")
-      or tr("Debug Mode: OFF", "デバッグモード: OFF"))
+      and tr("Debug Mode ✅", "デバッグモード ✅")
+      or tr("Debug Mode ⬜", "デバッグモード ⬜"))
   end
   local yes = find_prop(containers, "btn_paths_yes")
   if yes then
