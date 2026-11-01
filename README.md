@@ -1,18 +1,11 @@
-# Audio Device Restorer
+# Audio Device Restorer for OBS
 
 When OBS silently switches an audio device, restore your saved setup with **one click or a hotkey** — including volume, mute and (optionally) the filter settings, including VST plugin settings (the VST plugin itself is not backed up).
 
-> Tested on: OBS Studio 32.2.2, Windows 11
+> Tested on: OBS Studio 32.2.2, Windows 11. Languages: EN / JP / KR / ID / FR / TW (selector at the top of the settings).
+> Version 1.3.0 · Author: ChromeBread feat. BlackDream
 
 The settings are organised into framed groups: **Presets · Items to restore · Auto-save slots · Automation · Filters (VST settings) · Dock · Move presets to another PC**. (OBS scripts cannot color group backgrounds, so groups are shown as titled boxes.)
-
-Supported languages: EN / JP / KR / ID / FR / TW
-
-## Screenshots
-
-|Script 1/2|Script 2/2|Privacy Check|日本語 + Pushed "Show file paths..." with "Help" CustomBrowserDock|
-|---|---|---|---|
-|![](https://github.com/user-attachments/assets/831bded3-3206-4c13-b644-657b248e7b94)|![](https://github.com/user-attachments/assets/1dd3068a-8b59-47c5-b8b4-8c9f9b870fdf)|![](https://github.com/user-attachments/assets/3eab24d1-8c79-4d9a-a7d0-82ee7090e88a)|![](https://github.com/user-attachments/assets/5ecc202b-d9a4-4570-b8d9-eadfa07a32b0)|
 
 ## What is saved
 
@@ -29,6 +22,8 @@ All *Audio Input Capture* and *Audio Output Capture* sources (including the glob
 ## Items to restore
 
 In the **Items to restore** group you tick exactly what a restore changes. Everything is ticked by default except **Filters**:
+
+<img src="docs/images/preview-presets.png" alt="Presets and Items to restore groups in the script settings" width="420">
 
 | Checkbox | What is restored |
 |---|---|
@@ -62,7 +57,11 @@ Open **Settings → Hotkeys** and assign a key to **"Restore audio devices (Audi
 
 ## Auto-save slots (undo for accidental saves)
 
-Before a preset is lost, the script automatically keeps a copy in one of **9 auto-save slots**. A slot is created just before:
+Before a preset is lost, the script automatically keeps a copy in one of **9 auto-save slots**.
+
+<img src="docs/images/preview-slots-filters.png" alt="Auto-save slots, Automation and Filters groups in the script settings" width="420">
+
+A slot is created just before:
 
 - **Save current state** overwrites an existing preset,
 - **Delete preset** removes a preset,
@@ -92,11 +91,15 @@ Folder and file paths can reveal personal information (for example your Windows 
 
 Click **Show file paths…** (below the language selector). A *Privacy check* box asks whether to show them and reminds you to check that you are **not streaming or recording**. If streaming or recording is active, it says so and the button changes to **Show anyway (LIVE)**. Click **Hide file paths** to hide them again.
 
+![Privacy check while recording is active, with the Show anyway (LIVE) button](docs/images/preview-privacy.png)
+
 Messages in the Script Log never contain folder names — only file names. The hiding applies to this script's settings screen; the operating system's file-chooser window (**Browse**) naturally shows paths.
 
 ## Show presets in an OBS dock
 
 The script generates `audio_presets_dock.html`, which lists every saved preset (source, device name, volume, mute, number of filters) and the auto-save slots. For the selected preset, rows whose device differs from the current one are highlighted in red. It refreshes automatically every 3 s.
+
+![Preset dock with a row highlighted in red because its device differs from the saved one](docs/images/preview-dock.png)
 
 1. Copy the text in the **Dock URL** field (hidden until you click **Show file paths…**) of the script settings (`file:///.../audio_presets_dock.html`).
 2. In OBS open **Docks → Custom Browser Docks**. (Click **Show file paths…** first to reveal the Dock URL.)
@@ -105,6 +108,8 @@ The script generates `audio_presets_dock.html`, which lists every saved preset (
 The dock is **read-only**. Use the script's buttons or the hotkey to restore.
 
 ## Move presets to another PC
+
+<img src="docs/images/preview-move-presets.png" alt="Dock and Move presets to another PC groups, with the Help button at the bottom of the settings" width="420">
 
 1. On the old PC click **Show file paths…**, choose a file in **Export file (.json)** (e.g. on a USB drive) and click **Export all presets**.
 2. On the new PC register the same script, choose that file in **Import file (.json)**, and click **Import presets (merge)**. Presets with the same name are overwritten.
@@ -117,6 +122,8 @@ The dock is **read-only**. Use the script's buttons or the hotkey to restore.
 ## Help button and related files
 
 At the very bottom of the settings there is a small **Help** button. Clicking it shows the version, build date, author and the list of files that belong to this script (the folder is shown only after **Show file paths…**), so you can find them when uninstalling:
+
+![List of related files shown by the Help button (Japanese UI)](docs/images/preview-help.png)
 
 | File | Purpose |
 |---|---|

@@ -16,7 +16,7 @@ obs = obslua
 
 local VERSION = "1.3.0"
 local BUILD_DATE = "2026-10-19"
-local AUTHOR = "BlackDream feat. ChromeBread"
+local AUTHOR = "ChromeBread feat. BlackDream"
 
 ------------------------------------------------------------
 -- i18n (EN / JP)
