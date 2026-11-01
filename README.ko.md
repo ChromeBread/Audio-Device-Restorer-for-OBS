@@ -5,7 +5,7 @@
 OBS가 오디오 장치를 임의로 바꿨을 때 저장한 설정을 **원클릭 또는 단축키**로 되돌립니다. 볼륨, 음소거, 필요하면 필터 설정 (VST 플러그인 설정 포함)도 복원합니다. VST 플러그인 본체는 백업하지 않습니다.
 
 > 테스트 환경: OBS Studio 32.2.2, Windows 11. 언어: EN / JP / KR / ID / FR / TW
-> Version 1.5.0 ・ 제작자: ChromeBread feat. BlackDream ・ 라이선스: GPL-2.0
+> Version 1.6.0 ・ 제작자: ChromeBread feat. BlackDream ・ 라이선스: GPL-2.0
 
 ## 프리셋과 복원할 항목
 
