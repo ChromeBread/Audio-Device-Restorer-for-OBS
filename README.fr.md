@@ -42,3 +42,7 @@ Retirez le script dans **Outils → Scripts** (sélection, puis **−**), fermez
 Le détail complet est disponible en [English](README.md).
 
 Ce script tiers n'est pas officiel. Il n'est ni affilié au projet OBS ni approuvé par celui-ci.
+
+## Mises à jour
+
+Ce logiciel ne vérifie pas les mises à jour et ne se met pas à jour tout seul, et aucune fonction de mise à jour automatique connectée à Internet n'est prévue. Pour mettre à jour, suivez le lien du développeur et téléchargez vous-même la nouvelle version sur le site de distribution : [Releases](../../releases)

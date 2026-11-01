@@ -42,3 +42,7 @@ Hapus skrip dari **Alat → Skrip** (pilih, tekan **−**), tutup OBS, lalu jala
 Penjelasan lengkap tersedia di [English](README.md).
 
 Ini adalah skrip pihak ketiga tidak resmi. Tidak berafiliasi dengan atau didukung oleh OBS Project.
+
+## Tentang pembaruan
+
+Perangkat lunak ini tidak memeriksa pembaruan atau memperbarui dirinya sendiri, dan tidak ada rencana menambahkan fitur pembaruan otomatis yang terhubung ke internet. Untuk memperbarui, ikuti tautan pengembang dan unduh versi baru sendiri dari situs distribusi: [Releases](../../releases)

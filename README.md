@@ -134,3 +134,7 @@ All files except the exports are located in the same folder as the script. Hotke
 - If a saved device is not currently connected, restoring that source's device is skipped and a warning is logged.
 - With auto-restore on, save the new state first (or turn auto-restore off) when you change devices on purpose.
 - Use the **Script Log** button to see messages.
+
+## Updates
+
+This software does not check for updates or update itself, and no automatic update feature that connects to the internet is planned. To update, follow the developer's link and download the new version from the distribution site yourself: [Releases](../../releases)
