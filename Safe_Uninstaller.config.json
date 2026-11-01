@@ -1,0 +1,15 @@
+{
+  "app": "Audio Device Restorer for OBS",
+  "main": "audio_device_restorer.lua",
+  "items": [
+    { "name": "audio_device_restorer.lua", "kind": "core" },
+    { "name": "audio_device_presets.json", "kind": "settings" },
+    { "name": "audio_presets_dock.html", "kind": "generated" },
+    { "name": "audio_device_presets.luadata", "kind": "old" },
+    { "name": "audio_device_presets.json.bak", "kind": "generated" },
+    { "name": "audio_device_presets.json.tmp", "kind": "generated" },
+    { "name": "Safe_Uninstaller.bat", "kind": "core" },
+    { "name": "Safe_Uninstaller.config.json", "kind": "core" },
+    { "name": "Safe_Uninstaller.ps1", "kind": "core" }
+  ]
+}

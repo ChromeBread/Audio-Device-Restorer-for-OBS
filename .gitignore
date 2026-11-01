@@ -4,3 +4,5 @@ audio_device_presets.luadata
 audio_presets_dock.html
 # Original screenshots (published copies are in docs/images)
 PreviewSS/
+audio_device_presets.json.bak
+audio_device_presets.json.tmp

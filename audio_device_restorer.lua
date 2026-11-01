@@ -1,5 +1,5 @@
 --[[
-  Audio Device Restorer  -  OBS Studio Lua script  (v1.3.0)
+  Audio Device Restorer  -  OBS Studio Lua script  (v1.4.0)
   ------------------------------------------------------------
   EN: Save your audio devices (+ volume / mute) as presets and restore them
       with one click or a hotkey when OBS silently switches devices.
@@ -14,8 +14,8 @@
 
 obs = obslua
 
-local VERSION = "1.3.0"
-local BUILD_DATE = "2026-10-19"
+local VERSION = "1.4.0"
+local BUILD_DATE = { year = 2026, month = 11, day = 1 }
 local AUTHOR = "ChromeBread feat. BlackDream"
 
 ------------------------------------------------------------
@@ -58,6 +58,22 @@ local TR6 = {
   ["Cancel"] = X("취소", "Batal", "Annuler", "取消"),
   ["File paths are hidden for privacy. Use \"Show file paths…\" at the top."] = X("개인정보 보호를 위해 파일 경로를 숨겼습니다. 상단의 '파일 경로 표시…'를 사용하세요.", "Path file disembunyikan demi privasi. Gunakan \"Tampilkan path file…\" di bagian atas.", "Les chemins de fichiers sont masqués pour votre vie privée. Utilisez « Afficher les chemins de fichiers… » en haut.", "為保護隱私，檔案路徑已隱藏。請使用上方的「顯示檔案路徑…」。"),
   ["(hidden for privacy)"] = X("(개인정보 보호를 위해 숨김)", "(disembunyikan demi privasi)", "(masqué pour la confidentialité)", "(為保護隱私已隱藏)"),
+  ["Debug Mode: ON"] = X("디버그 모드: ON", "Mode Debug: ON", "Mode débogage : ON", "偵錯模式：ON"),
+  ["Debug Mode: OFF"] = X("디버그 모드: OFF", "Mode Debug: OFF", "Mode débogage : OFF", "偵錯模式：OFF"),
+  ["Debug Mode"] = X("디버그 모드", "Mode Debug", "Mode débogage", "偵錯模式"),
+  ["Uninstall"] = X("제거", "Hapus instalasi", "Désinstallation", "解除安裝"),
+  ["1. Export your settings below if you want to keep them."] = X("1. 설정을 유지하려면 아래 항목에서 내보내세요.", "1. Ekspor pengaturan di bawah jika ingin menyimpannya.", "1. Exportez vos réglages ci-dessous si vous voulez les garder.", "1. 若要保留設定，請先在下方匯出。"),
+  ["2. Tools > Scripts: select this script and press -."] = X("2. 도구 > 스크립트에서 이 스크립트를 선택하고 - 를 누르세요.", "2. Alat > Skrip: pilih skrip ini lalu tekan -.", "2. Outils > Scripts : sélectionnez ce script et cliquez sur -.", "2. 在 工具 > 腳本 中選取此腳本並按 -。"),
+  ["3. Run Safe_Uninstaller.bat from the folder below, or delete only the files listed here. Leave the folder itself."] = X("3. 아래 폴더의 Safe_Uninstaller.bat을 실행하거나, 여기 표시된 파일만 삭제하세요. 폴더 자체는 지우지 마세요.", "3. Jalankan Safe_Uninstaller.bat dari folder di bawah, atau hapus hanya file yang tercantum di sini. Jangan hapus foldernya.", "3. Lancez Safe_Uninstaller.bat depuis le dossier ci-dessous, ou effacez uniquement les fichiers listés ici, sans toucher au dossier.", "3. 執行下方資料夾中的 Safe_Uninstaller.bat，或只刪除此處列出的檔案。請勿刪除資料夾本身。"),
+  ["Export settings to"] = X("설정 내보내기 위치", "Ekspor pengaturan ke", "Exporter les réglages vers", "設定匯出至"),
+  ["Export settings"] = X("설정 내보내기", "Ekspor pengaturan", "Exporter les réglages", "匯出設定"),
+  ["Import settings from"] = X("설정 가져오기 파일", "Impor pengaturan dari", "Importer les réglages depuis", "設定匯入來源"),
+  ["Import settings"] = X("설정 가져오기", "Impor pengaturan", "Importer les réglages", "匯入設定"),
+  ["Choose a file first."] = X("먼저 파일을 선택하세요.", "Pilih file terlebih dahulu.", "Choisissez d'abord un fichier.", "請先選擇檔案。"),
+  ["The file could not be read or written."] = X("파일을 읽거나 쓸 수 없습니다.", "File tidak dapat dibaca atau ditulis.", "Impossible de lire ou d'écrire le fichier.", "無法讀取或寫入檔案。"),
+  ["This file belongs to a different script."] = X("다른 스크립트의 파일입니다.", "File ini milik skrip lain.", "Ce fichier appartient à un autre script.", "此檔案屬於其他腳本。"),
+  ["Settings exported."] = X("설정을 내보냈습니다.", "Pengaturan diekspor.", "Réglages exportés.", "已匯出設定。"),
+  ["Settings imported. Hotkeys apply after restarting OBS."] = X("설정을 가져왔습니다. 단축키는 OBS를 다시 시작하면 적용됩니다.", "Pengaturan diimpor. Hotkey berlaku setelah OBS dimulai ulang.", "Réglages importés. Les raccourcis s'appliquent après le redémarrage d'OBS.", "已匯入設定。快速鍵會在重新啟動 OBS 後套用。"),
   ["Presets"] = X("프리셋", "Preset", "Préréglages", "預設組"),
   ["Items to restore"] = X("복원할 항목", "Item yang dipulihkan", "Éléments à restaurer", "還原項目"),
   ["Automation"] = X("자동화", "Otomatisasi", "Automatisation", "自動化"),
@@ -443,7 +459,18 @@ local function old_data_path() return script_path() .. "audio_device_presets.lua
 local function dock_path() return script_path() .. "audio_presets_dock.html" end
 
 local function save_store()
-  local ok, err = write_file(data_path(), json_encode(store))
+  -- Written beside the real file first, so a power cut mid-write cannot damage the presets.
+  local path = data_path()
+  local tmp = path .. ".tmp"
+  local ok, err = write_file(tmp, json_encode(store))
+  if ok then
+    if obs.os_file_exists(path) then
+      ok = obs.os_safe_replace(path, tmp, path .. ".bak") == 0
+    else
+      ok = obs.os_rename(tmp, path) == 0
+    end
+    if not ok then err = tmp end
+  end
   if not ok then
     log(obs.LOG_ERROR, tr("Cannot write preset file: ", "保存ファイルを書き込めません: ") .. tostring(err))
   end
@@ -451,15 +478,18 @@ local function save_store()
 end
 
 local function load_store()
-  local text = read_file(data_path())
-  if text then
-    local ok, data = pcall(json_decode, text)
+  for _, path in ipairs({ data_path(), data_path() .. ".bak" }) do
+    local text = read_file(path)
+    local ok, data = false, nil
+    if text then ok, data = pcall(json_decode, text) end
     if ok and type(data) == "table" then
       store = data
       store.presets = store.presets or {}
       store.last = store.last or ""
       return
     end
+  end
+  if read_file(data_path()) then
     log(obs.LOG_WARNING, tr("Preset file is broken; starting empty", "プリセットファイルが壊れています。空の状態で開始します"))
   end
   -- 旧バージョン(.luadata)からの移行
@@ -1070,12 +1100,43 @@ local function find_prop(containers, id)
   return nil
 end
 
-local function build_help_text()
+local MONTHS = {
+  EN = { "January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December" },
+  FR = { "janvier", "février", "mars", "avril", "mai", "juin", "juillet", "août", "septembre", "octobre", "novembre", "décembre" },
+  ID = { "Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember" },
+}
+
+local function build_date_text()
+  local d = BUILD_DATE
+  if lang == "JP" or lang == "TW" then
+    return string.format("%d年%d月%d日", d.year, d.month, d.day)
+  elseif lang == "KR" then
+    return string.format("%d년 %d월 %d일", d.year, d.month, d.day)
+  elseif lang == "FR" then
+    return (d.day == 1 and "1er" or tostring(d.day)) .. " " .. MONTHS.FR[d.month] .. " " .. d.year
+  elseif lang == "ID" then
+    return d.day .. " " .. MONTHS.ID[d.month] .. " " .. d.year
+  end
+  return MONTHS.EN[d.month] .. " " .. d.day .. ", " .. d.year
+end
+
+local debug_mode = false
+
+local function build_about_text()
+  return "Audio Device Restorer for OBS v" .. VERSION .. "\n"
+    .. tr("Build date: ", "ビルド日: ") .. build_date_text() .. "\n"
+    .. tr("Author: ", "製作: ") .. AUTHOR
+end
+
+-- Shows the folder, which can reveal a user name, so it stays behind Debug Mode.
+local function build_uninstall_text()
   local lines = {
-    "Audio Device Restorer v" .. VERSION,
-    tr("Build date: ", "ビルド日: ") .. BUILD_DATE,
-    tr("Author: ", "製作: ") .. AUTHOR,
-    tr("Folder: ", "フォルダ: ") .. (paths_visible and script_path() or tr("(hidden for privacy)", "(プライバシー保護のため非表示)")),
+    tr("1. Export your settings below if you want to keep them.", "1. 設定を残す場合は、下の項目で書き出します。"),
+    tr("2. Tools > Scripts: select this script and press -.", "2. ツール > スクリプト でこのスクリプトを選び、- を押します。"),
+    tr("3. Run Safe_Uninstaller.bat from the folder below, or delete only the files listed here. Leave the folder itself.",
+       "3. 下のフォルダにある Safe_Uninstaller.bat を実行するか、ここに載っているファイルだけを削除します。フォルダ自体は消さないでください。"),
+    "",
+    tr("Folder: ", "フォルダ: ") .. script_path(),
     "",
     tr("Related files (delete these when uninstalling):", "関連ファイル (削除時の目印):"),
     "  audio_device_restorer.lua  " .. tr("(script)", "(スクリプト本体)"),
@@ -1091,7 +1152,9 @@ local function build_help_text()
 end
 
 local function set_help_text(settings)
-  obs.obs_data_set_string(settings, "help_text", build_help_text())
+  obs.obs_data_set_string(settings, "about_text", build_about_text())
+  obs.obs_data_set_string(settings, "help_text", build_about_text())
+  obs.obs_data_set_string(settings, "uninstall_text", build_uninstall_text())
 end
 
 local help_open = false
@@ -1107,6 +1170,28 @@ local function apply_visibility(containers, settings)
   end
   local g = find_prop(containers, "g_paths_confirm")
   if g then obs.obs_property_set_visible(g, confirm_open) end
+
+  local debug_btn = find_prop(containers, "btn_debug")
+  if debug_btn then
+    obs.obs_property_set_description(debug_btn, debug_mode
+      and tr("Debug Mode: ON", "デバッグモード: ON")
+      or tr("Debug Mode: OFF", "デバッグモード: OFF"))
+  end
+  local debug_group = find_prop(containers, "g_debug")
+  if debug_group then
+    obs.obs_property_set_visible(debug_group, debug_mode)
+    obs.obs_property_set_description(debug_group, tr("Debug Mode", "デバッグモード"))
+  end
+  for _, item in ipairs({
+    { "settings_export_path", tr("Export settings to", "設定の書き出し先") },
+    { "btn_settings_export", tr("Export settings", "設定を書き出す") },
+    { "settings_import_path", tr("Import settings from", "設定の読み込み元") },
+    { "btn_settings_import", tr("Import settings", "設定を読み込む") },
+    { "uninstall_text", tr("Uninstall", "アンインストール") },
+  }) do
+    local p = find_prop(containers, item[1])
+    if p then obs.obs_property_set_description(p, item[2]) end
+  end
 
   local live = is_live()
   local b = find_prop(containers, "btn_paths")
@@ -1157,6 +1242,69 @@ function script_defaults(settings)
   obs.obs_data_set_default_bool(settings, "auto_restore", false)
   obs.obs_data_set_default_bool(settings, "restore_on_start", false)
   obs.obs_data_set_default_string(settings, "new_name", "default")
+  obs.obs_data_set_default_bool(settings, "debug_mode", false)
+end
+
+-- Readable JSON, so a setting can still be copied by hand on another PC. Presets have their own export.
+local BACKUP_APP = "Audio Device Restorer for OBS"
+local BACKUP_SKIP = {
+  "dock_url", "export_path", "import_path", "filter_export_path", "filter_import_path",
+  "settings_export_path", "settings_import_path", "paths_confirm", "paths_hint_f", "paths_hint_d", "paths_hint_t",
+  "about_text", "help_text", "uninstall_text", "settings_status",
+}
+
+local function set_settings_status(text)
+  obs.obs_data_set_string(cur_settings, "settings_status", text)
+  log(obs.LOG_INFO, text)
+end
+
+local function export_settings()
+  local path = obs.obs_data_get_string(cur_settings, "settings_export_path")
+  if path == "" then
+    set_settings_status(tr("Choose a file first.", "先にファイルを選んでください。"))
+    return
+  end
+  script_save(cur_settings)
+  local data = obs.obs_data_create()
+  local copy = obs.obs_data_create_from_json(obs.obs_data_get_json(cur_settings))
+  for _, key in ipairs(BACKUP_SKIP) do obs.obs_data_erase(copy, key) end
+  obs.obs_data_set_string(data, "app", BACKUP_APP)
+  obs.obs_data_set_string(data, "version", VERSION)
+  obs.obs_data_set_obj(data, "settings", copy)
+  local save = obs.obs_data_save_json_pretty or obs.obs_data_save_json
+  local ok = save(data, path)
+  obs.obs_data_release(copy)
+  obs.obs_data_release(data)
+  set_settings_status(ok and tr("Settings exported.", "設定を書き出しました。")
+    or tr("The file could not be read or written.", "ファイルを読み書きできませんでした。"))
+end
+
+local function import_settings()
+  local path = obs.obs_data_get_string(cur_settings, "settings_import_path")
+  if path == "" then
+    set_settings_status(tr("Choose a file first.", "先にファイルを選んでください。"))
+    return
+  end
+  local data = obs.obs_data_create_from_json_file(path)
+  if not data then
+    set_settings_status(tr("The file could not be read or written.", "ファイルを読み書きできませんでした。"))
+    return
+  end
+  if obs.obs_data_get_string(data, "app") ~= BACKUP_APP then
+    obs.obs_data_release(data)
+    set_settings_status(tr("This file belongs to a different script.", "別のスクリプトのファイルです。"))
+    return
+  end
+  local settings = obs.obs_data_get_obj(data, "settings")
+  if settings then
+    for _, key in ipairs(BACKUP_SKIP) do obs.obs_data_erase(settings, key) end
+    obs.obs_data_erase(settings, "debug_mode")
+    obs.obs_data_apply(cur_settings, settings)
+    obs.obs_data_release(settings)
+  end
+  obs.obs_data_release(data)
+  script_update(cur_settings)
+  set_settings_status(tr("Settings imported. Hotkeys apply after restarting OBS.", "設定を読み込みました。ホットキーはOBSの再起動後に反映されます。"))
 end
 
 function script_update(settings)
@@ -1185,6 +1333,7 @@ function script_properties()
     refresh_status(settings)
     return true
   end)
+  obs.obs_properties_add_text(props, "about_text", "", obs.OBS_TEXT_INFO)
 
   -- プライバシー: ファイルの場所の表示/非表示
   paths_visible = false
@@ -1388,6 +1537,34 @@ function script_properties()
   obs.obs_property_set_visible(hp, false)
   if cur_settings then set_help_text(cur_settings) end
 
+  ------------------------------------------------------------
+  -- Debug Mode
+  ------------------------------------------------------------
+  obs.obs_properties_add_button(props, "btn_debug", "btn_debug", function()
+    debug_mode = not debug_mode
+    obs.obs_data_set_bool(cur_settings, "debug_mode", debug_mode)
+    apply_visibility(containers, cur_settings)
+    return true
+  end)
+  local gd = obs.obs_properties_create()
+  containers[#containers + 1] = gd
+  obs.obs_properties_add_text(gd, "uninstall_text", "", obs.OBS_TEXT_INFO)
+  obs.obs_properties_add_path(gd, "settings_export_path", "", obs.OBS_PATH_FILE_SAVE, "JSON (*.json)", nil)
+  obs.obs_properties_add_button(gd, "btn_settings_export", "", function()
+    export_settings()
+    return true
+  end)
+  obs.obs_properties_add_path(gd, "settings_import_path", "", obs.OBS_PATH_FILE, "JSON (*.json)", nil)
+  obs.obs_properties_add_button(gd, "btn_settings_import", "", function()
+    import_settings()
+    apply_labels(containers)
+    apply_visibility(containers, cur_settings)
+    if cur_settings then refresh_status(cur_settings) end
+    return true
+  end)
+  obs.obs_properties_add_text(gd, "settings_status", "", obs.OBS_TEXT_INFO)
+  obs.obs_properties_add_group(props, "g_debug", "g_debug", obs.OBS_GROUP_NORMAL, gd)
+
   apply_labels(containers)
   apply_visibility(containers, cur_settings)
   return props
@@ -1403,6 +1580,7 @@ function script_load(settings)
   cur_settings = settings
   local l = obs.obs_data_get_string(settings, "lang")
   if valid_lang(l) then lang = l else lang = default_lang() end
+  debug_mode = obs.obs_data_get_bool(settings, "debug_mode")
 
   load_store()
   store.autosaves = store.autosaves or {}
