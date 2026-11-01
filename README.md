@@ -87,9 +87,8 @@ Folder and file paths can reveal personal information (for example your Windows 
 
 - the export / import file fields (filters and presets),
 - the Dock URL,
-- the folder shown in the Help text.
 
-Click **Show file paths…** (below the language selector). A *Privacy check* box asks whether to show them and reminds you to check that you are **not streaming or recording**. If streaming or recording is active, it says so and the button changes to **Show anyway (LIVE)**. Click **Hide file paths** to hide them again.
+Turn on **Debug Mode** (below the language selector). A *Privacy check* box asks whether to show them and reminds you to check that you are **not streaming or recording**. If streaming or recording is active, it says so and the button changes to **Show anyway (LIVE)**. Turn Debug Mode off to hide them again. It is off each time the settings are opened.
 
 ![Privacy check while recording is active, with the Show anyway (LIVE) button](docs/images/preview-privacy.png)
 
@@ -101,17 +100,17 @@ The script generates `audio_presets_dock.html`, which lists every saved preset (
 
 ![Preset dock with a row highlighted in red because its device differs from the saved one](docs/images/preview-dock.png)
 
-1. Copy the text in the **Dock URL** field (hidden until you click **Show file paths…**) of the script settings (`file:///.../audio_presets_dock.html`).
-2. In OBS open **Docks → Custom Browser Docks**. (Click **Show file paths…** first to reveal the Dock URL.)
+1. Copy the text in the **Dock URL** field (hidden until you turn on **Debug Mode**) of the script settings (`file:///.../audio_presets_dock.html`).
+2. In OBS open **Docks → Custom Browser Docks**.
 3. Enter a dock name (e.g. `Audio Presets`), paste the URL, and click **Apply**.
 
 The dock is **read-only**. Use the script's buttons or the hotkey to restore.
 
 ## Move presets to another PC
 
-<img src="docs/images/preview-move-presets.png" alt="Dock and Move presets to another PC groups, with the Help button at the bottom of the settings" width="420">
+<img src="docs/images/preview-move-presets.png" alt="Dock and Move presets to another PC groups" width="420">
 
-1. On the old PC click **Show file paths…**, choose a file in **Export file (.json)** (e.g. on a USB drive) and click **Export all presets**.
+1. On the old PC turn on **Debug Mode**, choose a file in **Export file (.json)** (e.g. on a USB drive) and click **Export all presets**.
 2. On the new PC register the same script, choose that file in **Import file (.json)**, and click **Import presets (merge)**. Presets with the same name are overwritten.
 3. Select a preset and restore it.
 

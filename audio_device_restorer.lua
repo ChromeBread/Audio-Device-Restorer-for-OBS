@@ -48,15 +48,13 @@ local TR6 = {
   ["Export filter settings"] = X("필터 설정 내보내기", "Ekspor pengaturan filter", "Exporter les réglages de filtres", "匯出濾鏡設定"),
   ["Import filter settings"] = X("필터 설정 가져오기", "Impor pengaturan filter", "Importer les réglages de filtres", "匯入濾鏡設定"),
   ["Saves / applies the filter settings (incl. VST plugin settings) of audio sources, matched by source name. The VST plugin itself is NOT included - install it on the target PC."] = X("오디오 소스의 필터 설정(VST 플러그인 설정 포함)을 소스 이름 기준으로 저장/적용합니다. VST 플러그인 자체는 포함되지 않으므로 대상 PC에 설치해야 합니다.", "Menyimpan / menerapkan pengaturan filter (termasuk pengaturan plugin VST) sumber audio berdasarkan nama sumber. Plugin VST itu sendiri TIDAK disertakan - pasang di PC tujuan.", "Enregistre / applique les réglages de filtres (dont les réglages des plugins VST) des sources audio, selon le nom de la source. Le plugin VST lui-même n'est PAS inclus : installez-le sur le PC cible.", "依來源名稱儲存 / 套用音訊來源的濾鏡設定 (含 VST 外掛設定)。不包含 VST 外掛本身，請在目標電腦自行安裝。"),
-  ["Show file paths…"] = X("파일 경로 표시…", "Tampilkan path file…", "Afficher les chemins de fichiers…", "顯示檔案路徑…"),
-  ["Hide file paths"] = X("파일 경로 숨기기", "Sembunyikan path file", "Masquer les chemins de fichiers", "隱藏檔案路徑"),
   ["Privacy check"] = X("개인정보 확인", "Pemeriksaan privasi", "Vérification de confidentialité", "隱私確認"),
   ["Show folder / file paths? They can reveal personal information (e.g. your user name) if your screen is being shared. Check that you are NOT streaming or recording before you continue."] = X("폴더 / 파일 경로를 표시할까요? 화면을 공유 중이면 사용자 이름 등 개인정보가 노출될 수 있습니다. 방송 중이나 녹화 중이 아닌지 확인한 후 선택하세요.", "Tampilkan path folder / file? Path dapat mengungkap informasi pribadi (mis. nama pengguna Anda) jika layar Anda dibagikan. Pastikan Anda TIDAK sedang siaran atau merekam sebelum melanjutkan.", "Afficher les chemins de dossiers / fichiers ? Ils peuvent révéler des informations personnelles (ex. votre nom d'utilisateur) si votre écran est partagé. Vérifiez que vous ne diffusez PAS et n'enregistrez PAS avant de continuer.", "要顯示資料夾 / 檔案路徑嗎？若正在分享畫面，路徑可能洩漏個人資訊 (例如使用者名稱)。請先確認目前沒有在直播或錄影，再繼續。"),
   ["⚠ Streaming or recording is ACTIVE right now."] = X("⚠ 지금 방송 중이거나 녹화 중입니다.", "⚠ Siaran atau perekaman SEDANG berlangsung.", "⚠ Une diffusion ou un enregistrement est EN COURS.", "⚠ 目前正在直播或錄影中。"),
   ["Yes, show paths"] = X("예, 경로 표시", "Ya, tampilkan path", "Oui, afficher", "是，顯示路徑"),
   ["Show anyway (LIVE)"] = X("그래도 표시 (진행 중)", "Tetap tampilkan (LIVE)", "Afficher quand même (EN DIRECT)", "仍要顯示 (直播中)"),
   ["Cancel"] = X("취소", "Batal", "Annuler", "取消"),
-  ["File paths are hidden for privacy. Use \"Show file paths…\" at the top."] = X("개인정보 보호를 위해 파일 경로를 숨겼습니다. 상단의 '파일 경로 표시…'를 사용하세요.", "Path file disembunyikan demi privasi. Gunakan \"Tampilkan path file…\" di bagian atas.", "Les chemins de fichiers sont masqués pour votre vie privée. Utilisez « Afficher les chemins de fichiers… » en haut.", "為保護隱私，檔案路徑已隱藏。請使用上方的「顯示檔案路徑…」。"),
+  ["File paths are hidden for privacy. Turn on Debug Mode at the top."] = X("개인정보 보호를 위해 파일 경로를 숨겼습니다. 상단에서 디버그 모드를 켜세요.", "Path file disembunyikan demi privasi. Aktifkan Mode Debug di bagian atas.", "Les chemins sont masqués pour la confidentialité. Activez le mode débogage en haut.", "為保護隱私已隱藏檔案路徑。請在上方開啟偵錯模式。"),
   ["(hidden for privacy)"] = X("(개인정보 보호를 위해 숨김)", "(disembunyikan demi privasi)", "(masqué pour la confidentialité)", "(為保護隱私已隱藏)"),
   ["Debug Mode: ON"] = X("디버그 모드: ON", "Mode Debug: ON", "Mode débogage : ON", "偵錯模式：ON"),
   ["Debug Mode: OFF"] = X("디버그 모드: OFF", "Mode Debug: OFF", "Mode débogage : OFF", "偵錯模式：OFF"),
@@ -203,7 +201,6 @@ local LABELS = {
   restore_sync = { "Sync offset", "同期オフセット" },
   filter_export_path = { "Export to (.json)", "書き出し先 (.json)" },
   filter_import_path = { "Import from (.json)", "読み込み元 (.json)" },
-  btn_help = { "Help", "ヘルプ" },
   lang            = { "Language", "言語" },
   preset          = { "Preset", "プリセット" },
   btn_restore     = { "▶ Restore preset", "▶ プリセットを復元" },
@@ -1081,8 +1078,8 @@ local function do_filter_import()
   log(obs.LOG_INFO, string.format(tr("Imported filters into %d source(s) (%d not found)", "%d 個のソースにフィルターを読み込みました (見つからない: %d 個)"), done, missing))
 end
 
--- プライバシー: フォルダ/ファイルの場所は、確認を通すまで画面に出さない
-local paths_visible = false
+-- プライバシー: フォルダ/ファイルの場所はデバッグモードON時だけ見せる。OBSの画面を開くたびにOFFへ戻す
+local debug_mode = false
 local confirm_open = false
 
 local PATH_IDS = { "filter_export_path", "filter_import_path", "export_path", "import_path", "dock_url" }
@@ -1120,8 +1117,6 @@ local function build_date_text()
   return MONTHS.EN[d.month] .. " " .. d.day .. ", " .. d.year
 end
 
-local debug_mode = false
-
 local function build_about_text()
   return "Audio Device Restorer for OBS v" .. VERSION .. "\n"
     .. tr("Build date: ", "ビルド日: ") .. build_date_text() .. "\n"
@@ -1153,30 +1148,21 @@ end
 
 local function set_help_text(settings)
   obs.obs_data_set_string(settings, "about_text", build_about_text())
-  obs.obs_data_set_string(settings, "help_text", build_about_text())
   obs.obs_data_set_string(settings, "uninstall_text", build_uninstall_text())
 end
-
-local help_open = false
 
 local function apply_visibility(containers, settings)
   for _, id in ipairs(PATH_IDS) do
     local p = find_prop(containers, id)
-    if p then obs.obs_property_set_visible(p, paths_visible) end
+    if p then obs.obs_property_set_visible(p, debug_mode) end
   end
   for _, id in ipairs(HINT_IDS) do
     local p = find_prop(containers, id)
-    if p then obs.obs_property_set_visible(p, not paths_visible) end
+    if p then obs.obs_property_set_visible(p, not debug_mode) end
   end
   local g = find_prop(containers, "g_paths_confirm")
   if g then obs.obs_property_set_visible(g, confirm_open) end
 
-  local debug_btn = find_prop(containers, "btn_debug")
-  if debug_btn then
-    obs.obs_property_set_description(debug_btn, debug_mode
-      and tr("Debug Mode: ON", "デバッグモード: ON")
-      or tr("Debug Mode: OFF", "デバッグモード: OFF"))
-  end
   local debug_group = find_prop(containers, "g_debug")
   if debug_group then
     obs.obs_property_set_visible(debug_group, debug_mode)
@@ -1196,9 +1182,9 @@ local function apply_visibility(containers, settings)
   local live = is_live()
   local b = find_prop(containers, "btn_paths")
   if b then
-    obs.obs_property_set_description(b, paths_visible
-      and tr("Hide file paths", "ファイルの場所を隠す")
-      or tr("Show file paths…", "ファイルの場所を表示…"))
+    obs.obs_property_set_description(b, debug_mode
+      and tr("Debug Mode: ON", "デバッグモード: ON")
+      or tr("Debug Mode: OFF", "デバッグモード: OFF"))
   end
   local yes = find_prop(containers, "btn_paths_yes")
   if yes then
@@ -1214,8 +1200,8 @@ local function apply_visibility(containers, settings)
       t = tr("⚠ Streaming or recording is ACTIVE right now.", "⚠ 現在、配信中または録画中です。") .. "\n" .. t
     end
     obs.obs_data_set_string(settings, "paths_confirm", t)
-    local h = tr("File paths are hidden for privacy. Use \"Show file paths…\" at the top.",
-                 "ファイルの場所はプライバシー保護のため非表示です。上の「ファイルの場所を表示…」を使ってください。")
+    local h = tr("File paths are hidden for privacy. Turn on Debug Mode at the top.",
+                 "ファイルの場所はプライバシー保護のため非表示です。上のデバッグモードをONにしてください。")
     for _, k in ipairs({ "paths_hint_f", "paths_hint_d", "paths_hint_t" }) do
       obs.obs_data_set_string(settings, k, h)
     end
@@ -1242,7 +1228,6 @@ function script_defaults(settings)
   obs.obs_data_set_default_bool(settings, "auto_restore", false)
   obs.obs_data_set_default_bool(settings, "restore_on_start", false)
   obs.obs_data_set_default_string(settings, "new_name", "default")
-  obs.obs_data_set_default_bool(settings, "debug_mode", false)
 end
 
 -- Readable JSON, so a setting can still be copied by hand on another PC. Presets have their own export.
@@ -1250,7 +1235,7 @@ local BACKUP_APP = "Audio Device Restorer for OBS"
 local BACKUP_SKIP = {
   "dock_url", "export_path", "import_path", "filter_export_path", "filter_import_path",
   "settings_export_path", "settings_import_path", "paths_confirm", "paths_hint_f", "paths_hint_d", "paths_hint_t",
-  "about_text", "help_text", "uninstall_text", "settings_status",
+  "about_text", "uninstall_text", "settings_status",
 }
 
 local function set_settings_status(text)
@@ -1298,7 +1283,6 @@ local function import_settings()
   local settings = obs.obs_data_get_obj(data, "settings")
   if settings then
     for _, key in ipairs(BACKUP_SKIP) do obs.obs_data_erase(settings, key) end
-    obs.obs_data_erase(settings, "debug_mode")
     obs.obs_data_apply(cur_settings, settings)
     obs.obs_data_release(settings)
   end
@@ -1316,7 +1300,6 @@ end
 function script_properties()
   local props = obs.obs_properties_create()
   local containers = { props }
-  help_open = false
   refs = {}
 
   -- 言語選択 (グループ化しない)
@@ -1336,11 +1319,11 @@ function script_properties()
   obs.obs_properties_add_text(props, "about_text", "", obs.OBS_TEXT_INFO)
 
   -- プライバシー: ファイルの場所の表示/非表示
-  paths_visible = false
+  debug_mode = false
   confirm_open = false
   obs.obs_properties_add_button(props, "btn_paths", "btn_paths", function()
-    if paths_visible then
-      paths_visible = false
+    if debug_mode then
+      debug_mode = false
       confirm_open = false
     else
       confirm_open = true
@@ -1352,7 +1335,7 @@ function script_properties()
   containers[#containers + 1] = gp
   obs.obs_properties_add_text(gp, "paths_confirm", "", obs.OBS_TEXT_INFO)
   obs.obs_properties_add_button(gp, "btn_paths_yes", "btn_paths_yes", function()
-    paths_visible = true
+    debug_mode = true
     confirm_open = false
     apply_visibility(containers, cur_settings)
     return true
@@ -1524,28 +1507,11 @@ function script_properties()
   end)
   obs.obs_properties_add_group(props, "g_transfer", "g_transfer", obs.OBS_GROUP_NORMAL, g7)
 
-  ------------------------------------------------------------
-  -- Help (控えめ。押すと情報が展開される)
-  ------------------------------------------------------------
-  obs.obs_properties_add_button(props, "btn_help", "btn_help", function(p)
-    help_open = not help_open
-    local hp = obs.obs_properties_get(p, "help_text")
-    if hp then obs.obs_property_set_visible(hp, help_open) end
-    return true
-  end)
-  local hp = obs.obs_properties_add_text(props, "help_text", "", obs.OBS_TEXT_INFO)
-  obs.obs_property_set_visible(hp, false)
   if cur_settings then set_help_text(cur_settings) end
 
   ------------------------------------------------------------
   -- Debug Mode
   ------------------------------------------------------------
-  obs.obs_properties_add_button(props, "btn_debug", "btn_debug", function()
-    debug_mode = not debug_mode
-    obs.obs_data_set_bool(cur_settings, "debug_mode", debug_mode)
-    apply_visibility(containers, cur_settings)
-    return true
-  end)
   local gd = obs.obs_properties_create()
   containers[#containers + 1] = gd
   obs.obs_properties_add_text(gd, "uninstall_text", "", obs.OBS_TEXT_INFO)
@@ -1580,7 +1546,6 @@ function script_load(settings)
   cur_settings = settings
   local l = obs.obs_data_get_string(settings, "lang")
   if valid_lang(l) then lang = l else lang = default_lang() end
-  debug_mode = obs.obs_data_get_bool(settings, "debug_mode")
 
   load_store()
   store.autosaves = store.autosaves or {}
