@@ -56,8 +56,6 @@ local TR6 = {
   ["Cancel"] = X("취소", "Batal", "Annuler", "取消"),
   ["File paths are hidden for privacy. Turn on Debug Mode at the top."] = X("개인정보 보호를 위해 파일 경로를 숨겼습니다. 상단에서 디버그 모드를 켜세요.", "Path file disembunyikan demi privasi. Aktifkan Mode Debug di bagian atas.", "Les chemins sont masqués pour la confidentialité. Activez le mode débogage en haut.", "為保護隱私已隱藏檔案路徑。請在上方開啟偵錯模式。"),
   ["(hidden for privacy)"] = X("(개인정보 보호를 위해 숨김)", "(disembunyikan demi privasi)", "(masqué pour la confidentialité)", "(為保護隱私已隱藏)"),
-  ["Debug Mode ✅"] = X("디버그 모드 ✅", "Mode Debug ✅", "Mode débogage ✅", "偵錯模式 ✅"),
-  ["Debug Mode ⬜"] = X("디버그 모드 ⬜", "Mode Debug ⬜", "Mode débogage ⬜", "偵錯模式 ⬜"),
   ["Debug Mode"] = X("디버그 모드", "Mode Debug", "Mode débogage", "偵錯模式"),
   ["Uninstall"] = X("제거", "Hapus instalasi", "Désinstallation", "解除安裝"),
   ["1. Export your settings below if you want to keep them."] = X("1. 설정을 유지하려면 아래 항목에서 내보내세요.", "1. Ekspor pengaturan di bawah jika ingin menyimpannya.", "1. Exportez vos réglages ci-dessous si vous voulez les garder.", "1. 若要保留設定，請先在下方匯出。"),
@@ -1180,12 +1178,8 @@ local function apply_visibility(containers, settings)
   end
 
   local live = is_live()
-  local b = find_prop(containers, "btn_paths")
-  if b then
-    obs.obs_property_set_description(b, debug_mode
-      and tr("Debug Mode ✅", "デバッグモード ✅")
-      or tr("Debug Mode ⬜", "デバッグモード ⬜"))
-  end
+  local b = find_prop(containers, "debug_mode")
+  if b then obs.obs_property_set_description(b, tr("Debug Mode", "デバッグモード")) end
   local yes = find_prop(containers, "btn_paths_yes")
   if yes then
     obs.obs_property_set_description(yes, live
@@ -1235,7 +1229,7 @@ local BACKUP_APP = "Audio Device Restorer for OBS"
 local BACKUP_SKIP = {
   "dock_url", "export_path", "import_path", "filter_export_path", "filter_import_path",
   "settings_export_path", "settings_import_path", "paths_confirm", "paths_hint_f", "paths_hint_d", "paths_hint_t",
-  "about_text", "uninstall_text", "settings_status",
+  "about_text", "uninstall_text", "settings_status", "debug_mode",
 }
 
 local function set_settings_status(text)
@@ -1321,14 +1315,14 @@ function script_properties()
   -- プライバシー: ファイルの場所の表示/非表示
   debug_mode = false
   confirm_open = false
-  obs.obs_properties_add_button(props, "btn_paths", "btn_paths", function()
-    if debug_mode then
-      debug_mode = false
-      confirm_open = false
-    else
-      confirm_open = true
-    end
-    apply_visibility(containers, cur_settings)
+  if cur_settings then obs.obs_data_set_bool(cur_settings, "debug_mode", false) end
+  local debug_prop = obs.obs_properties_add_bool(props, "debug_mode", "debug_mode")
+  obs.obs_property_set_modified_callback(debug_prop, function(_, _, settings)
+    local on = obs.obs_data_get_bool(settings, "debug_mode")
+    if on == (debug_mode or confirm_open) then return false end
+    debug_mode = false
+    confirm_open = on
+    apply_visibility(containers, settings)
     return true
   end)
   local gp = obs.obs_properties_create()
@@ -1342,6 +1336,7 @@ function script_properties()
   end)
   obs.obs_properties_add_button(gp, "btn_paths_no", "btn_paths_no", function()
     confirm_open = false
+    obs.obs_data_set_bool(cur_settings, "debug_mode", false)
     apply_visibility(containers, cur_settings)
     return true
   end)
