@@ -1,5 +1,5 @@
 --[[
-  Audio Device Restorer  -  OBS Studio Lua script  (v1.4.0)
+  Audio Device Restorer  -  OBS Studio Lua script  (v1.5.0)
   ------------------------------------------------------------
   EN: Save your audio devices (+ volume / mute) as presets and restore them
       with one click or a hotkey when OBS silently switches devices.
@@ -14,7 +14,7 @@
 
 obs = obslua
 
-local VERSION = "1.4.0"
+local VERSION = "1.5.0"
 local BUILD_DATE = { year = 2026, month = 11, day = 1 }
 local AUTHOR = "ChromeBread feat. BlackDream"
 

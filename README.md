@@ -1,9 +1,11 @@
+**English** | [日本語](README.ja.md) | [한국어](README.ko.md) | [Bahasa Indonesia](README.id.md) | [Français](README.fr.md) | [繁體中文](README.zh-TW.md)
+
 # Audio Device Restorer for OBS
 
 When OBS silently switches an audio device, restore your saved setup with **one click or a hotkey** — including volume, mute and (optionally) the filter settings, including VST plugin settings (the VST plugin itself is not backed up).
 
 > Tested on: OBS Studio 32.2.2, Windows 11. Languages: EN / JP / KR / ID / FR / TW (selector at the top of the settings).
-> Version 1.4.0 · Author: ChromeBread feat. BlackDream · License: GPL-2.0
+> Version 1.5.0 · Author: ChromeBread feat. BlackDream · License: GPL-2.0
 
 The settings are organised into framed groups: **Presets · Items to restore · Auto-save slots · Automation · Filters (VST settings) · Dock · Move presets to another PC**. (OBS scripts cannot color group backgrounds, so groups are shown as titled boxes.)
 
@@ -23,7 +25,7 @@ All *Audio Input Capture* and *Audio Output Capture* sources (including the glob
 
 In the **Items to restore** group you tick exactly what a restore changes. Everything is ticked by default except **Filters**:
 
-<img src="docs/images/preview-presets.png" alt="Presets and Items to restore groups in the script settings" width="420">
+<img src="docs/images/en/audio_settings.png" alt="Presets and Items to restore groups" width="400">
 
 | Checkbox | What is restored |
 |---|---|
@@ -59,8 +61,6 @@ Open **Settings → Hotkeys** and assign a key to **"Restore audio devices (Audi
 
 Before a preset is lost, the script automatically keeps a copy in one of **9 auto-save slots**.
 
-<img src="docs/images/preview-slots-filters.png" alt="Auto-save slots, Automation and Filters groups in the script settings" width="420">
-
 A slot is created just before:
 
 - **Save current state** overwrites an existing preset,
@@ -90,15 +90,13 @@ Folder and file paths can reveal personal information (for example your Windows 
 
 Turn on **Debug Mode** (below the language selector). A *Privacy check* box asks whether to show them and reminds you to check that you are **not streaming or recording**. If streaming or recording is active, it says so and the button changes to **Show anyway (LIVE)**. Turn Debug Mode off to hide them again. It is off each time the settings are opened.
 
-![Privacy check while recording is active, with the Show anyway (LIVE) button](docs/images/preview-privacy.png)
-
 Messages in the Script Log never contain folder names — only file names. The hiding applies to this script's settings screen; the operating system's file-chooser window (**Browse**) naturally shows paths.
 
 ## Show presets in an OBS dock
 
 The script generates `audio_presets_dock.html`, which lists every saved preset (source, device name, volume, mute, number of filters) and the auto-save slots. For the selected preset, rows whose device differs from the current one are highlighted in red. It refreshes automatically every 3 s.
 
-![Preset dock with a row highlighted in red because its device differs from the saved one](docs/images/preview-dock.png)
+<img src="docs/images/en/audio_dock.png" alt="Preset dock with a row highlighted in red because its device differs from the saved one" width="440">
 
 1. Copy the text in the **Dock URL** field (hidden until you turn on **Debug Mode**) of the script settings (`file:///.../audio_presets_dock.html`).
 2. In OBS open **Docks → Custom Browser Docks**.
@@ -107,8 +105,6 @@ The script generates `audio_presets_dock.html`, which lists every saved preset (
 The dock is **read-only**. Use the script's buttons or the hotkey to restore.
 
 ## Move presets to another PC
-
-<img src="docs/images/preview-move-presets.png" alt="Dock and Move presets to another PC groups" width="420">
 
 1. On the old PC turn on **Debug Mode**, choose a file in **Export file (.json)** (e.g. on a USB drive) and click **Export all presets**.
 2. On the new PC register the same script, choose that file in **Import file (.json)**, and click **Import presets (merge)**. Presets with the same name are overwritten.
@@ -121,8 +117,6 @@ The dock is **read-only**. Use the script's buttons or the hotkey to restore.
 ## Uninstall
 
 Remove the script from **Tools → Scripts** (select it, press **−**), close OBS, then run `Safe_Uninstaller.bat`. It shows what each file is, lets you choose what to remove, backs up your settings, explains moving to another PC, and sends everything to the Recycle Bin.
-
-![List of related files (Japanese UI)](docs/images/preview-help.png)
 
 | File | Purpose |
 |---|---|
