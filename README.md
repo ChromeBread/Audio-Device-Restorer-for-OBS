@@ -5,7 +5,7 @@
 When OBS silently switches an audio device, restore your saved setup with **one click or a hotkey** — including volume, mute and (optionally) the filter settings, including VST plugin settings (the VST plugin itself is not backed up).
 
 > Tested on: OBS Studio 32.2.2, Windows 11. Languages: EN / JP / KR / ID / FR / TW (selector at the top of the settings).
-> Version 1.6.0 · Author: ChromeBread feat. BlackDream · License: GPL-2.0
+> Version 1.7.0 · Author: ChromeBread feat. BlackDream · License: GPL-2.0
 
 The settings are organised into framed groups: **Presets · Items to restore · Auto-save slots · Automation · Filters (VST settings) · Dock · Move presets to another PC**. (OBS scripts cannot color group backgrounds, so groups are shown as titled boxes.)
 

@@ -5,7 +5,7 @@
 Saat OBS mengganti perangkat audio secara diam-diam, pulihkan pengaturan tersimpan dengan **satu klik atau hotkey**, termasuk volume, mute, dan (opsional) pengaturan filter serta pengaturan plugin VST. Plugin VST itu sendiri tidak dicadangkan.
 
 > Diuji pada: OBS Studio 32.2.2, Windows 11. Bahasa: EN / JP / KR / ID / FR / TW
-> Version 1.6.0 ・ Pembuat: ChromeBread feat. BlackDream ・ Lisensi: GPL-2.0
+> Version 1.7.0 ・ Pembuat: ChromeBread feat. BlackDream ・ Lisensi: GPL-2.0
 
 ## Preset dan item yang dipulihkan
 

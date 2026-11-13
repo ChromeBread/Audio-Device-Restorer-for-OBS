@@ -5,7 +5,7 @@
 當 OBS 自行切換音訊裝置時，可用 **一鍵或快速鍵** 還原已儲存的設定，包含音量、靜音，以及可選的濾鏡設定 (含 VST 外掛設定)。VST 外掛本身不會備份。
 
 > 測試環境: OBS Studio 32.2.2、Windows 11。語言: EN / JP / KR / ID / FR / TW
-> Version 1.6.0 ・ 製作者: ChromeBread feat. BlackDream ・ 授權: GPL-2.0
+> Version 1.7.0 ・ 製作者: ChromeBread feat. BlackDream ・ 授權: GPL-2.0
 
 ## 預設組與還原項目
 

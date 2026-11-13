@@ -5,7 +5,7 @@
 OBS が音声デバイスを勝手に切り替えたとき、保存した設定を **ワンクリックまたはホットキー** で元に戻します。音量、ミュート、必要に応じてフィルターの設定 (VST プラグインの設定を含む) も復元できます。VST プラグイン本体はバックアップしません。
 
 > 動作確認: OBS Studio 32.2.2、Windows 11。言語: EN / JP / KR / ID / FR / TW
-> Version 1.6.0 ・ 製作者: ChromeBread feat. BlackDream ・ ライセンス: GPL-2.0
+> Version 1.7.0 ・ 製作者: ChromeBread feat. BlackDream ・ ライセンス: GPL-2.0
 
 ## プリセットと復元する項目
 

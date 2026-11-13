@@ -5,7 +5,7 @@
 Quand OBS change un périphérique audio sans prévenir, restaurez votre configuration en **un clic ou avec un raccourci** : volume, sourdine et, en option, les filtres avec les réglages des plugins VST. Le plugin VST lui-même n'est pas sauvegardé.
 
 > Testé sur : OBS Studio 32.2.2, Windows 11. Langues : EN / JP / KR / ID / FR / TW
-> Version 1.6.0 ・ Auteur : ChromeBread feat. BlackDream ・ Licence : GPL-2.0
+> Version 1.7.0 ・ Auteur : ChromeBread feat. BlackDream ・ Licence : GPL-2.0
 
 ## Préréglages et éléments à restaurer
 
