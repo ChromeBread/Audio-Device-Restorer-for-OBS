@@ -139,7 +139,7 @@ local TR6 = {
   ["now: "] = X("현재: ", "sekarang: ", "actuel : ", "目前: "),
   ["MUTED"] = X("음소거됨", "BISU", "MUET", "已靜音"),
   ["Preset '%s' (saved: %s / %d sources)"] = X("프리셋 '%s' (저장: %s / 소스 %d개)", "Preset '%s' (disimpan: %s / %d sumber)", "Préréglage « %s » (enregistré : %s / %d sources)", "預設組「%s」(儲存: %s / %d 個來源)"),
-  ["→ Current devices match the saved state."] = X("→ 현재 장치가 저장된 상태와 일치합니다.", "→ Perangkat saat ini sesuai dengan kondisi tersimpan.", "→ Les périphériques actuels correspondent à l'état enregistré.", "→ 目前裝置與已儲存狀態相符。"),
+  ["→ Same as when saved."] = X("→ 저장했을 때와 같습니다.", "→ Sama seperti saat disimpan.", "→ Identique à l'enregistrement.", "→ 與儲存時相同。"),
   ["x %s : now '%s' -> saved '%s'"] = X("× %s : 현재 '%s' → 저장 '%s'", "× %s : sekarang '%s' → tersimpan '%s'", "× %s : actuel « %s » → enregistré « %s »", "× %s : 目前「%s」→ 已儲存「%s」"),
   ["Device change detected. Restoring automatically."] = X("장치 변경이 감지되었습니다. 자동으로 복원합니다.", "Perubahan perangkat terdeteksi. Memulihkan otomatis.", "Changement de périphérique détecté. Restauration automatique.", "偵測到裝置變更，正在自動還原。"),
   ["Running startup restore"] = X("시작 시 복원을 실행합니다", "Menjalankan pemulihan saat startup", "Exécution de la restauration au démarrage", "正在執行啟動時還原"),
@@ -154,6 +154,17 @@ local TR6 = {
   ["Saved preset '%s' (%d sources)"] = X("프리셋 '%s'을(를) 저장했습니다 (소스 %d개)", "Preset '%s' disimpan (%d sumber)", "Préréglage « %s » enregistré (%d sources)", "已儲存預設組「%s」(%d 個來源)"),
   ["Deleted preset '%s'"] = X("프리셋 '%s'을(를) 삭제했습니다", "Preset '%s' dihapus", "Préréglage « %s » supprimé", "已刪除預設組「%s」"),
   ["Restore audio devices (Audio Device Restorer)"] = X("오디오 장치 복원 (Audio Device Restorer)", "Pulihkan perangkat audio (Audio Device Restorer)", "Restaurer les périphériques audio (Audio Device Restorer)", "還原音訊裝置 (Audio Device Restorer)"),
+  ["1. Devices are right: Save current state\n2. OBS changed one: ▶ Restore preset"] = X(
+    "1. 장치가 올바를 때: 현재 상태 저장\n2. OBS가 바꿨을 때: ▶ 프리셋 복원",
+    "1. Perangkat sudah benar: Simpan kondisi saat ini\n2. OBS menggantinya: ▶ Pulihkan preset",
+    "1. Périphériques corrects : Enregistrer l'état actuel\n2. OBS en a changé un : ▶ Restaurer",
+    "1. 裝置正確時：儲存目前狀態\n2. OBS 變更裝置時：▶ 還原預設組"),
+  ["Write a log file"] = X("로그를 파일로 기록", "Tulis file log", "Écrire un fichier journal", "將記錄寫入檔案"),
+  ["Export log to"] = X("로그 내보내기 위치", "Ekspor log ke", "Exporter le journal vers", "記錄匯出至"),
+  ["Export log"] = X("로그 내보내기", "Ekspor log", "Exporter le journal", "匯出記錄"),
+  ["Log exported."] = X("로그를 내보냈습니다.", "Log diekspor.", "Journal exporté.", "已匯出記錄。"),
+  ["There is no log yet."] = X("아직 로그가 없습니다.", "Belum ada log.", "Aucun journal pour l'instant.", "尚無記錄。"),
+  ["(log, only while \"Write a log file\" is on)"] = X("(로그, \"로그를 파일로 기록\"이 켜져 있을 때만)", "(log, hanya saat \"Tulis file log\" aktif)", "(journal, seulement si « Écrire un fichier journal » est activé)", "(記錄，僅在開啟「將記錄寫入檔案」時)"),
 }
 
 local function tr(en, jp)
@@ -200,6 +211,9 @@ local LABELS = {
   filter_export_path = { "Export to (.json)", "書き出し先 (.json)" },
   filter_import_path = { "Import from (.json)", "読み込み元 (.json)" },
   lang            = { "Language", "言語" },
+  -- Short lines: the script panel is narrow and wraps long text in odd places.
+  preset_guide    = { "1. Devices are right: Save current state\n2. OBS changed one: ▶ Restore preset",
+                      "1. デバイスが正しいとき：現在の状態を保存\n2. OBS が変えたとき：▶ プリセットを復元" },
   preset          = { "Preset", "プリセット" },
   btn_restore     = { "▶ Restore preset", "▶ プリセットを復元" },
   new_name        = { "Preset name", "保存名" },
@@ -266,8 +280,33 @@ local function mask_paths(s)
   return s
 end
 
+-- Optional log file (Debug Mode), off by default. Kept whole in memory and rewritten,
+-- because io.open cannot open a path with non-ANSI characters (e.g. a Japanese user name).
+local LOG_FILE = "audio_device_restorer_log.txt"
+local LOG_MAX = 256 * 1024
+local log_to_file = false
+local log_text = nil
+
+local function log_file_append(level, line)
+  if not log_to_file then return end
+  local path = script_path() .. LOG_FILE
+  if log_text == nil then
+    local ok, s = pcall(obs.os_quick_read_utf8_file, path)
+    log_text = (ok and type(s) == "string") and s or ""
+  end
+  local name = (level == obs.LOG_ERROR and "error") or (level == obs.LOG_WARNING and "warning") or "info"
+  log_text = log_text .. os.date("%Y-%m-%d %H:%M:%S ") .. name .. ": " .. line .. "\r\n"
+  if #log_text > LOG_MAX then -- drop the older half
+    local cut = log_text:find("\n", #log_text - math.floor(LOG_MAX / 2), true)
+    log_text = cut and log_text:sub(cut + 1) or ""
+  end
+  obs.os_quick_write_utf8_file(path, log_text, #log_text, false)
+end
+
 local function log(level, msg)
-  obs.script_log(level, "[AudioDeviceRestorer] " .. mask_paths(msg))
+  local line = mask_paths(msg)
+  obs.script_log(level, "[AudioDeviceRestorer] " .. line)
+  log_file_append(level, line)
 end
 
 local function safe(fn, ...)
@@ -898,7 +937,7 @@ local function build_status()
     name, p.saved or "?", #(p.sources or {})) }
   local diffs = diff_preset(name) or {}
   if #diffs == 0 then
-    lines[#lines + 1] = tr("→ Current devices match the saved state.", "→ 現在のデバイスは保存状態と一致しています。")
+    lines[#lines + 1] = tr("→ Same as when saved.", "→ 保存したときと同じです。")
   else
     for _, d in ipairs(diffs) do
       lines[#lines + 1] = string.format(tr("x %s : now '%s' -> saved '%s'", "× %s : 現在『%s』 → 保存『%s』"),
@@ -1136,6 +1175,7 @@ local function build_uninstall_text()
     "  audio_device_presets.json  " .. tr("(presets + auto-save slots, one file)", "(プリセット+オートセーブスロット。1ファイル)"),
     "  audio_presets_dock.html  " .. tr("(dock page, auto-generated)", "(ドック用ページ。自動生成)"),
     "  audio_device_presets.luadata  " .. tr("(old presets, only if migrated)", "(旧形式のプリセット。移行した場合のみ)"),
+    "  " .. LOG_FILE .. "  " .. tr("(log, only while \"Write a log file\" is on)", "(ログ。「ログをファイルに書き出す」がONのときだけ)"),
     "  " .. tr("Exported .json files: wherever you saved them", "書き出した .json: 保存した場所"),
     "",
     tr("If you added the dock, remove it under Docks > Custom Browser Docks.", "ドックを追加した場合は、ドック > カスタムブラウザドック から削除してください"),
@@ -1172,6 +1212,9 @@ local function apply_visibility(containers, settings)
     { "settings_import_path", tr("Import settings from", "設定の読み込み元") },
     { "btn_settings_import", tr("Import settings", "設定を読み込む") },
     { "uninstall_text", tr("Uninstall", "アンインストール") },
+    { "log_to_file", tr("Write a log file", "ログをファイルに書き出す") },
+    { "log_export_path", tr("Export log to", "ログの書き出し先") },
+    { "btn_log_export", tr("Export log", "ログを書き出す") },
   }) do
     local p = find_prop(containers, item[1])
     if p then obs.obs_property_set_description(p, item[2]) end
@@ -1222,6 +1265,7 @@ function script_defaults(settings)
   obs.obs_data_set_default_bool(settings, "auto_restore", false)
   obs.obs_data_set_default_bool(settings, "restore_on_start", false)
   obs.obs_data_set_default_string(settings, "new_name", "default")
+  obs.obs_data_set_default_bool(settings, "log_to_file", false)
 end
 
 -- Readable JSON, so a setting can still be copied by hand on another PC. Presets have their own export.
@@ -1229,7 +1273,7 @@ local BACKUP_APP = "Audio Device Restorer for OBS"
 local BACKUP_SKIP = {
   "dock_url", "export_path", "import_path", "filter_export_path", "filter_import_path",
   "settings_export_path", "settings_import_path", "paths_confirm", "paths_hint_f", "paths_hint_d", "paths_hint_t",
-  "about_text", "uninstall_text", "settings_status", "debug_mode",
+  "about_text", "uninstall_text", "settings_status", "debug_mode", "log_export_path",
 }
 
 local function set_settings_status(text)
@@ -1285,10 +1329,31 @@ local function import_settings()
   set_settings_status(tr("Settings imported. Hotkeys apply after restarting OBS.", "設定を読み込みました。ホットキーはOBSの再起動後に反映されます。"))
 end
 
+local function export_log()
+  local path = trim(obs.obs_data_get_string(cur_settings, "log_export_path"))
+  if path == "" then
+    set_settings_status(tr("Choose a file first.", "先にファイルを選んでください。"))
+    return
+  end
+  if not path:lower():match("%.txt$") then path = path .. ".txt" end
+  local text = read_file(script_path() .. LOG_FILE)
+  if not text or text == "" then
+    set_settings_status(tr("There is no log yet.", "まだログがありません。"))
+    return
+  end
+  set_settings_status(write_file(path, text) and tr("Log exported.", "ログを書き出しました。")
+    or tr("The file could not be read or written.", "ファイルを読み書きできませんでした。"))
+end
+
 function script_update(settings)
   cur_settings = settings
   local l = obs.obs_data_get_string(settings, "lang")
   if valid_lang(l) then lang = l end
+  local on = obs.obs_data_get_bool(settings, "log_to_file")
+  if on ~= log_to_file then
+    log_to_file = on
+    if on then log(obs.LOG_INFO, "v" .. VERSION .. ": log file on") end
+  end
 end
 
 function script_properties()
@@ -1347,15 +1412,9 @@ function script_properties()
   ------------------------------------------------------------
   local g1 = obs.obs_properties_create()
   containers[#containers + 1] = g1
-  refs.preset = obs.obs_properties_add_list(g1, "preset", "preset", obs.OBS_COMBO_TYPE_LIST, obs.OBS_COMBO_FORMAT_STRING)
-  fill_preset_list(refs.preset)
-
-  obs.obs_properties_add_button(g1, "btn_restore", "btn_restore", function()
-    restore_current()
-    if cur_settings then refresh_status(cur_settings) end
-    return true
-  end)
-
+  -- Save comes first: with no preset yet, Restore has nothing to do. Script settings cannot colour a button,
+  -- so a short guide shows the order instead.
+  obs.obs_properties_add_text(g1, "preset_guide", "preset_guide", obs.OBS_TEXT_INFO)
   obs.obs_properties_add_text(g1, "new_name", "new_name", obs.OBS_TEXT_DEFAULT)
   obs.obs_properties_add_button(g1, "btn_save", "btn_save", function()
     local name = trim(obs.obs_data_get_string(cur_settings, "new_name"))
@@ -1374,6 +1433,22 @@ function script_properties()
     return true
   end)
 
+  refs.preset = obs.obs_properties_add_list(g1, "preset", "preset", obs.OBS_COMBO_TYPE_LIST, obs.OBS_COMBO_FORMAT_STRING)
+  fill_preset_list(refs.preset)
+
+  obs.obs_properties_add_button(g1, "btn_restore", "btn_restore", function()
+    restore_current()
+    if cur_settings then refresh_status(cur_settings) end
+    return true
+  end)
+
+  obs.obs_properties_add_button(g1, "btn_check", "btn_check", function()
+    refresh_status(cur_settings)
+    return true
+  end)
+  obs.obs_properties_add_text(g1, "status", "status", obs.OBS_TEXT_INFO)
+
+  -- Kept apart from Save so it is not pressed by mistake (a deleted preset can still be recovered from a slot).
   obs.obs_properties_add_button(g1, "btn_delete", "btn_delete", function()
     local name = obs.obs_data_get_string(cur_settings, "preset")
     if name ~= "" and store.presets[name] then
@@ -1388,12 +1463,6 @@ function script_properties()
     refresh_status(cur_settings)
     return true
   end)
-
-  obs.obs_properties_add_button(g1, "btn_check", "btn_check", function()
-    refresh_status(cur_settings)
-    return true
-  end)
-  obs.obs_properties_add_text(g1, "status", "status", obs.OBS_TEXT_INFO)
   obs.obs_properties_add_group(props, "g_presets", "g_presets", obs.OBS_GROUP_NORMAL, g1)
 
   ------------------------------------------------------------
@@ -1520,6 +1589,13 @@ function script_properties()
     import_settings()
     apply_labels(containers)
     apply_visibility(containers, cur_settings)
+    if cur_settings then refresh_status(cur_settings) end
+    return true
+  end)
+  obs.obs_properties_add_bool(gd, "log_to_file", "")
+  obs.obs_properties_add_path(gd, "log_export_path", "", obs.OBS_PATH_FILE_SAVE, "Text (*.txt)", nil)
+  obs.obs_properties_add_button(gd, "btn_log_export", "", function()
+    export_log()
     if cur_settings then refresh_status(cur_settings) end
     return true
   end)

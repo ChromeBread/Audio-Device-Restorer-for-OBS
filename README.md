@@ -23,9 +23,7 @@ All *Audio Input Capture* and *Audio Output Capture* sources (including the glob
 
 ## Items to restore
 
-In the **Items to restore** group you tick exactly what a restore changes. Everything is ticked by default except **Filters**:
-
-<img src="docs/images/en/audio_settings.png" alt="Presets and Items to restore groups" width="400">
+In the **Items to restore** group you tick exactly what a restore changes. Everything is ticked by default except **Filters**.
 
 | Checkbox | What is restored |
 |---|---|
@@ -39,10 +37,13 @@ In the **Items to restore** group you tick exactly what a restore changes. Every
 
 ## Setup
 
-1. In OBS open **Tools → Scripts → ＋** and select `audio_device_restorer.lua`.
-2. Set your sources up the way you want (choose **specific devices** rather than "Default", which follows the Windows default device and changes with it).
-3. In the **Presets** group enter a **preset name** (e.g. `Streaming`) and click **Save current state**.
-4. Whenever devices change, click **▶ Restore preset**.
+1. Put the whole `Audio_Device_Restorer_for_OBS` folder into `%APPDATA%\obs-studio\plugin_config\` (paste this path into the Explorer address bar to open it).
+2. In OBS open **Tools → Scripts → ＋** and select `audio_device_restorer.lua`.
+3. Set your sources up the way you want (choose **specific devices** rather than "Default", which follows the Windows default device and changes with it).
+4. In the **Presets** group enter a **preset name** (e.g. `Streaming`) and click **Save current state**.
+5. Whenever devices change, click **▶ Restore preset**.
+
+<img src="docs/images/en/audio_settings.png" alt="Presets group" width="400">
 
 ### Hotkey
 
@@ -74,21 +75,13 @@ To undo a mistake: pick the slot in the **Auto-save slots** drop-down, then clic
 
 ## Filters (VST settings)
 
-Presets already contain each source's filters (applied when **Filters** is ticked in *Items to restore*). The **Filters (VST settings)** group additionally lets you move filter settings by themselves:
+Presets already contain each source's filters (applied when **Filters** is ticked in *Items to restore*). Filter settings can also be exported and imported on their own, matched by source name.
 
-1. **Export filter settings** — choose a `.json` file in *Export to* and click the button. Every audio source that has at least one filter is saved, including the settings of VST plugins.
-2. **Import filter settings** — choose the file in *Import from* and click the button. Filters are applied to the sources **with the same name** (existing filters of those sources are replaced).
-
-**Only the settings are saved — the VST plugin itself (the plugin files) is NOT backed up.** The same VST plugin must be installed on the target PC (for VST 2.x also at the same plugin path) for an imported filter to work. Requires an OBS version that provides the filter backup API; otherwise a message is written to the Script Log.
+**Only the settings are saved — the VST plugin itself is NOT backed up.** Install the same VST plugin on the other PC.
 
 ## Privacy: file paths are hidden by default
 
-Folder and file paths can reveal personal information (for example your Windows user name) when your screen is shared. Therefore these are **hidden every time the settings are opened**:
-
-- the export / import file fields (filters and presets),
-- the Dock URL,
-
-Turn on **Debug Mode** (below the language selector). A *Privacy check* box asks whether to show them and reminds you to check that you are **not streaming or recording**. If streaming or recording is active, it says so and the button changes to **Show anyway (LIVE)**. Turn Debug Mode off to hide them again. It is off each time the settings are opened.
+Folder and file paths can reveal personal information (for example your Windows user name) when your screen is shared, so the settings keep them hidden. **Debug Mode** shows them.
 
 Messages in the Script Log never contain folder names — only file names. The hiding applies to this script's settings screen; the operating system's file-chooser window (**Browse**) naturally shows paths.
 
@@ -98,7 +91,7 @@ The script generates `audio_presets_dock.html`, which lists every saved preset (
 
 <img src="docs/images/en/audio_dock.png" alt="Preset dock with a row highlighted in red because its device differs from the saved one" width="440">
 
-1. Copy the text in the **Dock URL** field (hidden until you turn on **Debug Mode**) of the script settings (`file:///.../audio_presets_dock.html`).
+1. Copy the **Dock URL** from the script settings (it appears in **Debug Mode**).
 2. In OBS open **Docks → Custom Browser Docks**.
 3. Enter a dock name (e.g. `Audio Presets`), paste the URL, and click **Apply**.
 
@@ -106,13 +99,7 @@ The dock is **read-only**. Use the script's buttons or the hotkey to restore.
 
 ## Move presets to another PC
 
-1. On the old PC turn on **Debug Mode**, choose a file in **Export file (.json)** (e.g. on a USB drive) and click **Export all presets**.
-2. On the new PC register the same script, choose that file in **Import file (.json)**, and click **Import presets (merge)**. Presets with the same name are overwritten.
-3. Select a preset and restore it.
-
-- Device IDs differ between PCs, so devices are matched by **ID first, then by display name**. The same hardware (same display name) is restored correctly; devices that cannot be found are skipped with a warning in the log.
-- Sources whose **names do not exist** in the new OBS are skipped. Create sources with the same names first.
-- If export / import fails, try a path with only ASCII characters.
+Presets can be exported to a file and imported on another PC. Devices are matched by ID first, then by name, and sources by name.
 
 ## Uninstall
 
@@ -130,7 +117,7 @@ All files except the exports are located in the same folder as the script. Hotke
 
 ## Notes
 
-- Presets are stored next to the script (git-ignored). Put the script in a folder you can write to.
+- Presets are stored next to the script, so keep the folder in `plugin_config` (or another folder you can write to).
 - If a saved device is not currently connected, restoring that source's device is skipped and a warning is logged.
 - With auto-restore on, save the new state first (or turn auto-restore off) when you change devices on purpose.
 - Use the **Script Log** button to see messages.

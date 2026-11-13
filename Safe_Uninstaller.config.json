@@ -5,6 +5,7 @@
   "items": [
     { "name": "audio_device_restorer.lua", "kind": "core" },
     { "name": "audio_device_presets.json", "kind": "settings" },
+    { "name": "audio_device_restorer_log.txt", "kind": "generated" },
     { "name": "audio_presets_dock.html", "kind": "generated" },
     { "name": "audio_device_presets.luadata", "kind": "old" },
     { "name": "audio_device_presets.json.bak", "kind": "generated" },

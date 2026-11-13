@@ -9,15 +9,16 @@ Saat OBS mengganti perangkat audio secara diam-diam, pulihkan pengaturan tersimp
 
 ## Preset dan item yang dipulihkan
 
-<img src="docs/images/id/audio_settings.png" alt="Pengaturan preset dan item yang dipulihkan" width="400">
+<img src="docs/images/en/audio_settings.png" alt="Pengaturan preset" width="400">
 
 Pilih apa yang dipulihkan: perangkat, volume, mute, balance, monitoring, sync offset, dan filter. Semua aktif secara default kecuali filter.
 
 ## Cara pakai
-1. Di OBS buka **Alat → Skrip → +** dan pilih `audio_device_restorer.lua`.
-2. Atur sumber sesuai keinginan. Pilih **perangkat tertentu**, bukan "Default".
-3. Masukkan nama preset lalu tekan **Simpan kondisi saat ini**.
-4. Saat perangkat berubah, tekan **Pulihkan preset**.
+1. Letakkan seluruh folder `Audio_Device_Restorer_for_OBS` di `%APPDATA%\obs-studio\plugin_config\` (tempel jalur ini di bilah alamat Explorer untuk membukanya).
+2. Di OBS buka **Alat → Skrip → +** dan pilih `audio_device_restorer.lua`.
+3. Atur sumber sesuai keinginan. Pilih **perangkat tertentu**, bukan "Default".
+4. Masukkan nama preset lalu tekan **Simpan kondisi saat ini**.
+5. Saat perangkat berubah, tekan **Pulihkan preset**.
 
 Hotkey dapat diatur di **Pengaturan → Hotkey**.
 
@@ -34,7 +35,7 @@ Hotkey dapat diatur di **Pengaturan → Hotkey**.
 
 Dock menampilkan isi preset dan menandai perangkat yang berbeda dengan warna merah.
 
-Centang **Mode Debug** untuk menampilkan lokasi file seperti URL Dock. Layar konfirmasi muncul agar tidak terlihat saat siaran, dan mode ini mati setiap kali pengaturan dibuka.
+Lokasi file seperti URL Dock biasanya disembunyikan agar tidak terlihat saat siaran. Aktifkan **Mode Debug** untuk menampilkannya.
 
 ## Hapus instalasi
 Hapus skrip dari **Alat → Skrip** (pilih, tekan **−**), tutup OBS, lalu jalankan `Safe_Uninstaller.bat`. Alat ini menampilkan fungsi tiap file, memungkinkan Anda memilih yang dihapus, mencadangkan pengaturan, menjelaskan cara pindah ke PC lain, dan memindahkan semuanya ke Recycle Bin.

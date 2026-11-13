@@ -7,3 +7,4 @@ PreviewSS/
 audio_device_presets.json.bak
 audio_device_presets.json.tmp
 release/
+audio_device_restorer_log.txt
