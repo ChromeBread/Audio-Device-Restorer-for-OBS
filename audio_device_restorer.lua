@@ -1,3 +1,4 @@
+-- cbOBScripts: order=110 name="Audio Device Restorer"
 --[[
   Audio Device Restorer  -  OBS Studio Lua script  (v1.7.0)
   ------------------------------------------------------------
